@@ -15,30 +15,36 @@ mainQ = () => {
         .prompt([
             {
                 type: "list",
-                choices: ["Add Department", "Add Role", "Add Employee"],
+                choices: ["View all Departments", "View all Roles", "View all Employees"],
                 message: 'What would you like to do?',
                 name: 'main',
             }
         ]).then((response) => {
-            if (response.main == "Add Department") {
-                addDepartment();
+            if (response.main == "View all Departments") {
+                connection.query(
+                    'SELECT * FROM department',
+                    ['Page', 45],
+                    function(err, results) {
+                      console.table(results);
+                    }
+                  );
             }
 
         })
 }
 
-addDepartment = () => {
-    inquirer
-        .prompt([
-            {
-                type: 'text',
-                message: 'What is the name of the department?',
-                name: 'department',
-            }
-        ]).then((response) => {
+// addDepartment = () => {
+//     inquirer
+//         .prompt([
+//             {
+//                 type: 'text',
+//                 message: 'What is the name of the department?',
+//                 name: 'department',
+//             }
+//         ]).then((response) => {
                 
-        })
-}
+//         })
+// }
 
 // Connect to database
 const connection = mysql.createConnection(
@@ -53,14 +59,6 @@ const connection = mysql.createConnection(
 );
 
 // console.table(db.department);
-
-connection.query(
-    'SELECT * FROM department',
-    ['Page', 45],
-    function(err, results) {
-      console.table(results);
-    }
-  );
 
 // mainQ = () => {
 //     inquirer
