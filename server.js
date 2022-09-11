@@ -23,9 +23,27 @@ mainQ = () => {
             if (response.main == "View all Departments") {
                 connection.query(
                     'SELECT * FROM department',
-                    ['Page', 45],
                     function(err, results) {
                       console.table(results);
+                      mainQ();
+                    }
+                  );
+            }
+            if (response.main == "View all Roles") {
+                connection.query(
+                    'SELECT role.id, role.title, department.name AS department, role.salary FROM role JOIN department ON role.department_id = department.id',
+                    function(err, results) {
+                      console.table(results);
+                      mainQ();
+                    }
+                  );
+            }
+            if (response.main == "View all Employees") {
+                connection.query(
+                    'SELECT * FROM employee',
+                    function(err, results) {
+                      console.table(results);
+                      mainQ();
                     }
                   );
             }

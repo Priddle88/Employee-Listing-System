@@ -19,11 +19,13 @@ CREATE TABLE role (
 );
 
 CREATE TABLE employee (
-  id INT NOT NULL PRIMARY KEY,
+  id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
   first_name VARCHAR(30) NOT NULL,
   last_name VARCHAR(30) NOT NULL,
   role_id INT,
-  department_id INT DEFAULT NULL,
+  manager_id INT DEFAULT NULL,
+  FOREIGN KEY (manager_id)
+  REFERENCES employee(id),
   FOREIGN KEY (role_id)
   REFERENCES role(id)
   ON DELETE SET NULL
