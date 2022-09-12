@@ -11,8 +11,8 @@ VALUES ("Manager", 120000, 1),
        ("Financial Analyst", 75000, 3),
        ("IT Support Analyst", 65000, 4);
 
-INSERT INTO employee (first_name, last_name)
-VALUES ("Parker", "Riddle"),
-       ("Riddle", "Parker"),
-       ("Peter", "Parker"),
-       ("Spider", "Man");
+INSERT INTO employee (first_name, last_name, role_id)
+VALUES ("Parker", "Riddle", 1),
+       ("Riddle", "Parker", 2),
+       ("Peter", "Parker", 3),
+       ("Spider", "Man", 4);

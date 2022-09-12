@@ -40,7 +40,9 @@ mainQ = () => {
             }
             if (response.main == "View all Employees") {
                 connection.query(
-                    'SELECT * FROM employee',
+                    `SELECT employee.id AS id, employee.first_name, employee.last_name, role.title AS title
+                    FROM employee
+                    Join role ON employee.role_id = role.id;`,
                     function(err, results) {
                       console.table(results);
                       mainQ();
