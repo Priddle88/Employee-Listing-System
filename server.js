@@ -1,7 +1,7 @@
 const express = require('express');
 const mysql = require('mysql2');
 const cTable = require('console.table');
-const { listenerCount } = require('process');
+const { listenerCount, exit } = require('process');
 const inquirer = require('inquirer');
 const { findIndex } = require('rxjs');
 
@@ -16,6 +16,7 @@ let testNum = 0;
 let pkrole;
 let titleArray = [];
 let managerArray = [];
+let manArray = [];
 let eName;
 let eLast;
 let eRole;
@@ -57,7 +58,8 @@ mainQ = () => {
                     FROM employee
                     INNER JOIN role
                     ON employee.role_id = role.id
-                    JOIN department ON role.department_id = department.id`,
+                    JOIN department ON role.department_id = department.id
+                    ORDER BY id`,
                     function (err, results) {
                         console.table(results);
                         mainQ();
@@ -69,9 +71,9 @@ mainQ = () => {
                 addRole();
                 console.log(`This is testNum: ${testNum}`);
             } else if (response.main == "Add Employee") {
+                manArray = [];
                 addEmployee();
                 console.log(`This is testNum: ${testNum}`);
-                return
             }
 
         })
@@ -105,12 +107,22 @@ addDepartment = () => {
 
 viewManager = () => {
 
+    // connection.query(
+    //     `SELECT employee.id as manager
+    //      FROM employee
+    //       JOIN employee
+    //       ON employee.manager_id = employee.id`,
+    //     function (err, results) {
+    //         console.log(results);
+    //     }
+    // )
+
     connection.query(
         `UPDATE employee
         SET employee.manager_id = CONCAT(employee.first_name, " ", employee.last_name)
-        WHERE manager_id > 0`,
+        WHERE employee.manager_id > 0 `,
         function (err, results) {
-
+            console.log(results);
         }
     )
 }
@@ -214,22 +226,29 @@ selectRole = () => {
         function (err, results) {
 
 
-            console.table(results);
-            console.log(results);
+            // console.table(results);
+            // console.log(results);
             titleArray = [];
             results.map((i) => {
                 console.log(i.title);
                 titleArray.push(i.title);
             });
+
             results.map((i) => {
                 console.log(i.manager);
                 managerArray.push(i.manager);
             });
+
+            // console.log(manArray);
+            let tst = managerTest();
+            console.log(tst);
+            console.log(`THIS IS WHAT I WANT TO LOOK AT ${manArray}`);
+            manArray.push("null");
             managerArray = managerArray.filter(i => {
                 return i !== null;
             })
-            console.log(titleArray);
-            console.log(managerArray);
+            // console.log(titleArray);
+            // console.log(managerArray);
             inquirer
                 .prompt([
                     {
@@ -250,7 +269,7 @@ selectRole = () => {
                     },
                     {
                         type: 'list',
-                        choices: managerArray,
+                        choices: manArray,
                         message: 'Who is your manager?',
                         name: 'empManager',
                     }
@@ -265,6 +284,17 @@ selectRole = () => {
                 })
         })
 };
+
+managerTest = () => {
+    connection.query(
+        `SELECT CONCAT(employee.first_name, " ", employee.last_name) as manager
+        FROM employee
+        WHERE role_id = 1`,
+        function (err, results) {
+            results.forEach(i => manArray.push(i.manager));
+        }
+    )
+}
 
 fixRole = (x, y, z, a) => {
     connection.query(
@@ -290,7 +320,7 @@ insertEmployee = (first, last, role, manager) => {
             testNum++;
             console.log(`This is testNum: ${testNum}`);
             console.log(`This is a new test test: ${first}, ${last}, ${role}, ${manager}`);
-            if (testNum == 1) {
+            if (testNum >= 1) {
                 mainQ();
             }
             return;
