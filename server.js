@@ -6,6 +6,11 @@ const inquirer = require('inquirer');
 
 const PORT = process.env.PORT || 3001;
 const app = express();
+let newRole;
+let newSalary;
+let newDept;
+let newerRole;
+var departments;
 
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
@@ -113,34 +118,83 @@ viewManager = () => {
 // }
 
 addRole = () => {
-    inquirer
-        .prompt([
-            {
-                type: 'text',
-                message: 'What is the name of the role?',
-                name: 'roleName',
-            },
-            {
-                type: 'text',
-                message: 'What is the salary of this role?',
-                name: 'roleSalary',
-            },
-            {
-                type: 'text',
-                message: 'What department does this role belong to?',
-                name: 'roleDepartment',
-            }
-        ]).then((response) => {
-            let sql = `SELECT * FROM role`
-            connection.query(
-                `INSERT INTO role (title, salary)
-                VALUES ("${response.roleName}", ${response.roleSalary})`,
-                function (err, results) {
-                    console.table(sql)
-                    mainQ();
-                }
-            )
-        })
+
+    connection.query(`SELECT name FROM department`,
+        function (err, results) {
+            departments = results;
+            console.log(`This is test: departments`);
+            inquirer
+                .prompt([
+                    {
+                        type: 'text',
+                        message: 'What is the name of the role?',
+                        name: 'roleName',
+                    },
+                    {
+                        type: 'text',
+                        message: 'What is the salary of this role?',
+                        name: 'roleSalary',
+                    },
+                    {
+                        type: 'list',
+                        choices: departments,
+                        message: 'What department does this role belong to?',
+                        name: 'roleDepartment',
+                    }
+                ]).then((response) => {
+
+                    newDept = response.roleDepartment;
+                    newerRole = response.roleName;
+                    newSalary = response.roleSalary;
+                    // newRole = insertRole(newerRole);
+                    // console.log(newRole);
+                    console.log(newDept);
+                    console.log(newerRole);
+                    console.log(newSalary);
+                    findDeptId(newDept, newerRole, newSalary);
+                    console.log(findDeptId(newDept));
+
+                    // insertRole(newerRole, newSalary, findDeptId(newDept));
+                    // connection.query(
+                    //     `INSERT INTO role (title, salary, department_id)
+                    //     VALUES ("${response.roleName}", ${response.roleSalary}, ${response.roleDepartment})`,
+                    //     function (err, results) {
+                    //         mainQ();
+                    //     }
+                    // )
+
+                    console.log(findDeptId(newDept) + " " + newSalary + newerRole);
+                    // return newNum, newSalary, newerRole;
+                })
+        }
+    )
+}
+
+findDeptId = (newDept, newerRole, newSalary) => {
+    console.log(`Testing test test ${newerRole} ${newSalary}`);
+    connection.query(
+        `SELECT id
+        FROM department
+        WHERE name = "${newDept}"`,
+        function (err, results) {
+            let depId = results;
+            newRole = depId[0].id;
+            insertRole(newerRole, newSalary, newRole);
+            console.log(depId[0].id);
+            console.log("This is here");
+        }
+    )
+}
+
+insertRole = (newerRole, newSalary, newRole) => {
+    console.log(`This is a new test test: ${newRole} ${newerRole} ${newSalary}`);
+    connection.query(
+        `INSERT INTO role (title, salary, department_id)
+        VALUES ("${newerRole}", "${newSalary}", ${newRole})`,
+        function (err, results) {
+            // console.table(results);
+        }
+    )
 }
 
 // Connect to database
@@ -151,7 +205,8 @@ const connection = mysql.createConnection(
         password: 'rootroot',
         database: 'employees_db'
     },
-    console.log(`Connected to the employees_db database.`)
+    console.log(`Connected to the employees_db database.`),
+    mainQ()
 );
 
 app.get('/api/department', (req, res) => {
@@ -183,12 +238,6 @@ app.get('/api/role', (req, res) => {
         });
     });
 });
-// async function main() {
-//     // query database
-//     const [rows, fields] = await connection.execute('SELECT * FROM `table` WHERE `name` = ? AND `age` > ?', ['Morty', 14]);
-// }
-
-mainQ();
 
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);

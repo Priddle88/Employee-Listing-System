@@ -13,12 +13,15 @@
 -- JOIN department ON role.department_id = department.id)
 
 
-SELECT employee.id AS id, employee.first_name, employee.last_name, role.title AS title, department.name AS department, role.salary, employee.manager_id AS manager
-FROM employee
-INNER JOIN role
-ON employee.role_id = role.id
-JOIN department ON role.department_id = department.id;
+-- SELECT employee.id AS id, employee.first_name, employee.last_name, role.title AS title, department.name AS department, role.salary, employee.manager_id AS manager
+-- FROM employee
+-- INNER JOIN role
+-- ON employee.role_id = role.id
+-- JOIN department ON role.department_id = department.id;
 
-UPDATE employee
-SET employee.manager_id = CONCAT(employee.first_name, " ", employee.last_name)
-WHERE manager_id = 1;
+-- UPDATE employee
+-- SET employee.manager_id = CONCAT(employee.first_name, " ", employee.last_name)
+-- WHERE manager_id = 1;
+
+SELECT name FROM department;
+
