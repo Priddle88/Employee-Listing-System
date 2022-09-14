@@ -12,6 +12,9 @@ let newDept;
 let newerRole;
 var departments;
 let testNum = 0;
+let pkrole;
+let titleArray = [];
+let managerArray = [];
 
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
@@ -60,6 +63,10 @@ mainQ = () => {
             } else if (response.main == "Add Role") {
                 addRole();
                 console.log(`This is testNum: ${testNum}`);
+            } else if (response.main == "Add Employee") {
+                addEmployee();
+                console.log(`This is testNum: ${testNum}`);
+                return
             }
 
         })
@@ -96,7 +103,7 @@ viewManager = () => {
     connection.query(
         `UPDATE employee
         SET employee.manager_id = CONCAT(employee.first_name, " ", employee.last_name)
-        WHERE manager_id = 1`,
+        WHERE manager_id > 0`,
         function (err, results) {
 
         }
@@ -187,6 +194,64 @@ insertRole = (newerRole, newSalary, newRole) => {
         }
     )
 }
+
+addEmployee = () => {
+    selectRole();
+}
+
+selectRole = () => {
+    viewManager();
+    connection.query(`SELECT role.title AS title, employee.manager_id AS manager
+     FROM role
+     JOIN employee
+     ON role.id = employee.id
+     `,
+        function (err, results) {
+
+
+            console.table(results);
+            console.log(results);
+            titleArray = [];
+            results.map((i) => {
+                console.log(i.title);
+                titleArray.push(i.title);
+            });
+            results.map((i) => {
+                console.log(i.manager);
+                managerArray.push(i.manager);
+            });
+            managerArray = managerArray.filter(i => {
+                return i !== null;
+            })
+            console.log(titleArray);
+            console.log(managerArray);
+            inquirer
+                .prompt([
+                    {
+                        type: 'text',
+                        message: 'What is the your first name?',
+                        name: 'empName',
+                    },
+                    {
+                        type: 'text',
+                        message: 'What is the your last name?',
+                        name: 'empLast',
+                    },
+                    {
+                        type: 'list',
+                        choices: titleArray,
+                        message: 'What is your role?',
+                        name: 'empRole',
+                    },
+                    {
+                        type: 'list',
+                        choices: managerArray,
+                        message: 'Who is your manager?',
+                        name: 'empManager',
+                    }
+                ]).then((response) => { })
+        })
+};
 
 // Connect to database
 const connection = mysql.createConnection(
