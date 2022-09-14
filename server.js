@@ -3,6 +3,7 @@ const mysql = require('mysql2');
 const cTable = require('console.table');
 const { listenerCount } = require('process');
 const inquirer = require('inquirer');
+const { findIndex } = require('rxjs');
 
 const PORT = process.env.PORT || 3001;
 const app = express();
@@ -15,6 +16,10 @@ let testNum = 0;
 let pkrole;
 let titleArray = [];
 let managerArray = [];
+let eName;
+let eLast;
+let eRole;
+let eManager;
 
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
@@ -180,7 +185,6 @@ findDeptId = (newDept, newerRole, newSalary) => {
 }
 
 insertRole = (newerRole, newSalary, newRole) => {
-    console.log(`This is a new test test: ${newRole} ${newerRole} ${newSalary}`);
     connection.query(
         `INSERT INTO role (title, salary, department_id)
         VALUES ("${newerRole}", "${newSalary}", ${newRole})`,
@@ -188,6 +192,7 @@ insertRole = (newerRole, newSalary, newRole) => {
             // console.table(results);
             testNum++;
             console.log(`This is testNum: ${testNum}`);
+            console.log(`This is a new test test: ${newRole} ${newerRole} ${newSalary}`);
             if (testNum == 3) {
                 mainQ();
             }
@@ -249,8 +254,59 @@ selectRole = () => {
                         message: 'Who is your manager?',
                         name: 'empManager',
                     }
-                ]).then((response) => { })
+                ]).then((response) => {
+                    console.log(`${response.empName} ${response.empLast} ${response.empRole} ${response.empManager}`);
+                    eName = response.empName;
+                    eLast = response.empLast;
+                    eRole = response.empRole;
+                    eManager = response.empManager;
+
+                    fixRole(eRole, eName, eLast, eManager);
+                })
         })
+};
+
+fixRole = (x, y, z, a) => {
+    connection.query(
+        `SELECT id
+        FROM role
+        WHERE title = ?`, [x],
+        function (err, results) {
+            let depId = results;
+            newRole = depId[0].id;
+            insertEmployee(y, z, newRole, a);
+            console.log(newRole, y, z, a);
+            return;
+        }
+    )
+};
+
+insertEmployee = (first, last, role, manager) => {
+    connection.query(
+        `INSERT INTO employee (first_name, last_name, role_id, manager_id)
+        VALUES ("${first}", "${last}", ${role}, "${manager}")`,
+        function (err, results) {
+            // console.table(results);
+            testNum++;
+            console.log(`This is testNum: ${testNum}`);
+            console.log(`This is a new test test: ${first}, ${last}, ${role}, ${manager}`);
+            if (testNum == 1) {
+                mainQ();
+            }
+            return;
+        }
+    )
+};
+
+fixManager = (x) => {
+    connection.query(
+        `UPDATE employee
+        SET employee.manager_id = employee.id
+        WHERE CONCAT(employee.first_name, " ", employee.last_name) = ?`, [x],
+        function (err, results) {
+
+        }
+    )
 };
 
 // Connect to database
@@ -282,6 +338,21 @@ app.get('/api/department', (req, res) => {
 
 app.get('/api/role', (req, res) => {
     const sql = 'SELECT * FROM role';
+
+    connection.query(sql, (err, rows) => {
+        if (err) {
+            res.status(500).json({ error: err.message });
+            return;
+        }
+        res.json({
+            message: 'success',
+            data: rows
+        });
+    });
+});
+
+app.get('/api/employee', (req, res) => {
+    const sql = 'SELECT * FROM employee';
 
     connection.query(sql, (err, rows) => {
         if (err) {
