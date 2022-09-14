@@ -11,6 +11,7 @@ let newSalary;
 let newDept;
 let newerRole;
 var departments;
+let testNum = 0;
 
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
@@ -33,8 +34,7 @@ mainQ = () => {
                         mainQ();
                     }
                 );
-            }
-            if (response.main == "View all Roles") {
+            } else if (response.main == "View all Roles") {
                 connection.query(
                     'SELECT role.id, role.title, department.name AS department, role.salary FROM role JOIN department ON role.department_id = department.id',
                     function (err, results) {
@@ -42,8 +42,7 @@ mainQ = () => {
                         mainQ();
                     }
                 );
-            }
-            if (response.main == "View all Employees") {
+            } else if (response.main == "View all Employees") {
                 viewManager();
                 connection.query(
                     `SELECT employee.id AS id, employee.first_name, employee.last_name, role.title AS title, department.name AS department, role.salary, employee.manager_id AS manager
@@ -56,15 +55,21 @@ mainQ = () => {
                         mainQ();
                     }
                 );
-            }
-            if (response.main == "Add Department") {
+            } else if (response.main == "Add Department") {
                 addDepartment();
-            }
-            if (response.main == "Add Role") {
+            } else if (response.main == "Add Role") {
                 addRole();
+                console.log(`This is testNum: ${testNum}`);
             }
 
         })
+}
+
+mainMenu = (testNum) => {
+    console.log(`Test num is equal to: ${testNum}`);
+    if (testNum = 1) {
+        mainQ();
+    }
 }
 
 addDepartment = () => {
@@ -97,25 +102,6 @@ viewManager = () => {
         }
     )
 }
-
-// addDepartment = () => {
-//     inquirer
-//         .prompt([
-//             {
-//                 type: 'text',
-//                 message: 'What is the name of the department?',
-//                 name: 'dpmtName',
-//             }
-//         ]).then((response) => {
-//             connection.query(
-//                 `INSERT INTO department (name)
-//                 VALUES ("${response.dpmtName}")`,
-//                 function (err, results) {
-//                     mainQ();
-//                 }
-//             )
-//         })
-// }
 
 addRole = () => {
 
@@ -193,6 +179,11 @@ insertRole = (newerRole, newSalary, newRole) => {
         VALUES ("${newerRole}", "${newSalary}", ${newRole})`,
         function (err, results) {
             // console.table(results);
+            testNum++;
+            console.log(`This is testNum: ${testNum}`);
+            if (testNum == 3) {
+                mainQ();
+            }
         }
     )
 }
