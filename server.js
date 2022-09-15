@@ -29,6 +29,7 @@ let listEmp = [];
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
+// Main menu of the page. Where everything begins
 mainQ = () => {
     inquirer
         .prompt([
@@ -87,6 +88,7 @@ mainQ = () => {
         })
 }
 
+// Goes to the main menu after a testnum is equal to 3
 mainMenu = (testNum) => {
     console.log(`Test num is equal to: ${testNum}`);
     if (testNum = 1) {
@@ -94,6 +96,7 @@ mainMenu = (testNum) => {
     }
 }
 
+// Adds a department
 addDepartment = () => {
     inquirer
         .prompt([
@@ -113,17 +116,8 @@ addDepartment = () => {
         })
 }
 
+// Views the managers
 viewManager = () => {
-
-    // connection.query(
-    //     `SELECT employee.id as manager
-    //      FROM employee
-    //       JOIN employee
-    //       ON employee.manager_id = employee.id`,
-    //     function (err, results) {
-    //         console.log(results);
-    //     }
-    // )
 
     connection.query(
         `UPDATE employee
@@ -135,6 +129,7 @@ viewManager = () => {
     )
 }
 
+// Adds a role
 addRole = () => {
 
     connection.query(`SELECT name FROM department`,
@@ -164,30 +159,19 @@ addRole = () => {
                     newDept = response.roleDepartment;
                     newerRole = response.roleName;
                     newSalary = response.roleSalary;
-                    // newRole = insertRole(newerRole);
-                    // console.log(newRole);
                     console.log(newDept);
                     console.log(newerRole);
                     console.log(newSalary);
                     findDeptId(newDept, newerRole, newSalary);
                     console.log(findDeptId(newDept));
 
-                    // insertRole(newerRole, newSalary, findDeptId(newDept));
-                    // connection.query(
-                    //     `INSERT INTO role (title, salary, department_id)
-                    //     VALUES ("${response.roleName}", ${response.roleSalary}, ${response.roleDepartment})`,
-                    //     function (err, results) {
-                    //         mainQ();
-                    //     }
-                    // )
-
                     console.log(findDeptId(newDept) + " " + newSalary + newerRole);
-                    // return newNum, newSalary, newerRole;
                 })
         }
     )
 }
 
+// Finds a department id based off a department name
 findDeptId = (newDept, newerRole, newSalary) => {
     console.log(`Testing test test ${newerRole} ${newSalary}`);
     connection.query(
@@ -204,12 +188,12 @@ findDeptId = (newDept, newerRole, newSalary) => {
     )
 }
 
+// Creates a new role
 insertRole = (newerRole, newSalary, newRole) => {
     connection.query(
         `INSERT INTO role (title, salary, department_id)
         VALUES ("${newerRole}", "${newSalary}", ${newRole})`,
         function (err, results) {
-            // console.table(results);
             testNum++;
             console.log(`This is testNum: ${testNum}`);
             console.log(`This is a new test test: ${newRole} ${newerRole} ${newSalary}`);
@@ -220,11 +204,8 @@ insertRole = (newerRole, newSalary, newRole) => {
     )
 }
 
+// Creates the employees
 addEmployee = () => {
-    selectRole();
-}
-
-selectRole = () => {
     viewManager();
     connection.query(`SELECT role.title AS title, employee.manager_id AS manager
      FROM role
@@ -233,9 +214,6 @@ selectRole = () => {
      `,
         function (err, results) {
 
-
-            // console.table(results);
-            // console.log(results);
             titleArray = [];
             results.map((i) => {
                 console.log(i.title);
@@ -247,16 +225,15 @@ selectRole = () => {
                 managerArray.push(i.manager);
             });
 
-            // console.log(manArray);
+
             let tst = managerTest();
             console.log(tst);
             console.log(`THIS IS WHAT I WANT TO LOOK AT ${manArray}`);
             manArray.push("null");
             managerArray = managerArray.filter(i => {
                 return i !== null;
-            })
-            // console.log(titleArray);
-            // console.log(managerArray);
+            });
+
             inquirer
                 .prompt([
                     {
@@ -293,6 +270,7 @@ selectRole = () => {
         })
 };
 
+// Creates a list of managers
 managerTest = () => {
     connection.query(
         `SELECT CONCAT(employee.first_name, " ", employee.last_name) as manager
@@ -304,6 +282,7 @@ managerTest = () => {
     )
 }
 
+// recieves and returns an id for role
 fixRole = (x, y, z, a) => {
     connection.query(
         `SELECT id
@@ -319,6 +298,7 @@ fixRole = (x, y, z, a) => {
     )
 };
 
+// gets the id for a role
 fixRoleAgain = (x) => {
     connection.query(
         `SELECT id
@@ -329,12 +309,12 @@ fixRoleAgain = (x) => {
         })
 }
 
+// Creates a new employee
 insertEmployee = (first, last, role, manager) => {
     connection.query(
         `INSERT INTO employee (first_name, last_name, role_id, manager_id)
         VALUES ("${first}", "${last}", ${role}, "${manager}")`,
         function (err, results) {
-            // console.table(results);
             testNum++;
             console.log(`This is testNum: ${testNum}`);
             console.log(`This is a new test test: ${first}, ${last}, ${role}, ${manager}`);
@@ -346,6 +326,7 @@ insertEmployee = (first, last, role, manager) => {
     )
 };
 
+// Fixes the managers names to be where they should
 fixManager = (x) => {
     connection.query(
         `UPDATE employee
@@ -357,32 +338,30 @@ fixManager = (x) => {
     )
 };
 
+// Gets roles
 roleId = () => {
     connection.query(
         `SELECT role.title as title FROM role`,
         function (err, results) {
             console.log(results);
-            // results.forEach(i => roleArray.push(i.title));
         })
 }
 
+// List of roles 
 empList = () => {
     connection.query(
-        `SELECT employee.first_name as employees, role.title AS title
-         FROM employee
-         JOIN role
-         ON role.id = employee.id`,
+        `SELECT role.title AS title
+         FROM role`,
         function (err, results) {
-            results.forEach(i => empArray.push(i.employees));
+            roleArray = [];
             results.forEach(i => roleArray.push(i.title));
-            console.log(empArray);
 
             empPrompts();
-            // console.log(`${empR[0]} and ${empN[0]}`);
         }
     )
 }
 
+// Prompts to update the role for an employee
 empPrompts = () => {
     inquirer
         .prompt([
@@ -404,29 +383,16 @@ empPrompts = () => {
             empN.push(response.empName);
             empR.push(response.empRole);
             findRoleId();
-            // console.log(`${empR} and ${empN}`);
-
-            // connection.query(
-            //     `SELECT id
-            //     FROM role
-            //     WHERE title = "empArray"`,
-            //     function (err, results) {
-            //         // console.log(`IMPORTANT: ${x} + ${y}`);
-            //         console.log(results);
-            //         console.log(` and ${empN}`);
-            //         mainQ();
-            //     }
-            // )
         })
 }
 
+// Updates the employee role for a specific employee
 findRoleId = () => {
     connection.query(
         `SELECT id
         FROM role
         WHERE title = "${empR}"`,
         function (err, results) {
-            // console.log(`IMPORTANT: ${x} + ${y}`);
             console.log(results[0].id);
             console.log(`${results[0].id} and ${empN}`);
             connection.query(
@@ -442,6 +408,7 @@ findRoleId = () => {
     )
 }
 
+// Updates the employee role for a specific employee
 updateEmp = (x, y) => {
     console.log(`IMPORTANT: ${x} + ${y}`);
     connection.query(
@@ -455,11 +422,11 @@ updateEmp = (x, y) => {
     )
 };
 
+// Fills an array of all employess
 allEmp = () => {
     connection.query(
         `SELECT first_name FROM employee`,
         function (err, results) {
-            // console.log(results[0].first_name);
             listEmp = [];
             console.log(results[0].first_name);
             results.forEach(i => listEmp.push(i.first_name));
@@ -480,6 +447,7 @@ const connection = mysql.createConnection(
     mainQ()
 );
 
+// Send the data of departments
 app.get('/api/department', (req, res) => {
     const sql = 'SELECT * FROM department';
 
@@ -495,6 +463,7 @@ app.get('/api/department', (req, res) => {
     });
 });
 
+// Send the data of roles
 app.get('/api/role', (req, res) => {
     const sql = 'SELECT * FROM role';
 
@@ -510,6 +479,7 @@ app.get('/api/role', (req, res) => {
     });
 });
 
+// Send the data of employee
 app.get('/api/employee', (req, res) => {
     const sql = 'SELECT * FROM employee';
 
@@ -525,6 +495,7 @@ app.get('/api/employee', (req, res) => {
     });
 });
 
+// Launch the server
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
