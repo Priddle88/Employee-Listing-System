@@ -265,7 +265,7 @@ managerTest = () => {
         }
     )
 }
-
+// list of roles without the functions attached
 newRoleList = () => {
     connection.query(
         `SELECT role.title AS title
@@ -273,19 +273,6 @@ newRoleList = () => {
         function (err, results) {
             role2Array = [];
             results.forEach(i => role2Array.push(i.title));
-        }
-    )
-}
-
-empList = () => {
-    connection.query(
-        `SELECT role.title AS title
-         FROM role`,
-        function (err, results) {
-            roleArray = [];
-            results.forEach(i => roleArray.push(i.title));
-
-            empPrompts();
         }
     )
 }
