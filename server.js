@@ -18,6 +18,7 @@ let roleArray = [];
 let titleArray = [];
 let managerArray = [];
 let manArray = [];
+let role2Array = [];
 let eName;
 let eLast;
 let eRole;
@@ -193,8 +194,8 @@ insertRole = (newerRole, newSalary, newRole) => {
 
 // Creates the employees
 addEmployee = () => {
+    newRoleList();
     viewManager();
-    empList();
     connection.query(`SELECT role.title AS title, employee.manager_id AS manager
      FROM role
      JOIN employee
@@ -232,7 +233,7 @@ addEmployee = () => {
                     },
                     {
                         type: 'list',
-                        choices: roleArray,
+                        choices: role2Array,
                         message: 'What is your role?',
                         name: 'empRole',
                     },
@@ -261,6 +262,30 @@ managerTest = () => {
         WHERE role_id = 1`,
         function (err, results) {
             results.forEach(i => manArray.push(i.manager));
+        }
+    )
+}
+
+newRoleList = () => {
+    connection.query(
+        `SELECT role.title AS title
+         FROM role`,
+        function (err, results) {
+            role2Array = [];
+            results.forEach(i => role2Array.push(i.title));
+        }
+    )
+}
+
+empList = () => {
+    connection.query(
+        `SELECT role.title AS title
+         FROM role`,
+        function (err, results) {
+            roleArray = [];
+            results.forEach(i => roleArray.push(i.title));
+
+            empPrompts();
         }
     )
 }
