@@ -74,11 +74,9 @@ mainQ = () => {
                 addDepartment();
             } else if (response.main == "Add Role") {
                 addRole();
-                console.log(`This is testNum: ${testNum}`);
             } else if (response.main == "Add Employee") {
                 manArray = [];
                 addEmployee();
-                console.log(`This is testNum: ${testNum}`);
             } else if (response.main == "Update Employee Role") {
                 // roleId();
                 allEmp();
@@ -90,7 +88,6 @@ mainQ = () => {
 
 // Goes to the main menu after a testnum is equal to 3
 mainMenu = (testNum) => {
-    console.log(`Test num is equal to: ${testNum}`);
     if (testNum = 1) {
         mainQ();
     }
@@ -124,7 +121,7 @@ viewManager = () => {
         SET employee.manager_id = CONCAT(employee.first_name, " ", employee.last_name)
         WHERE employee.manager_id > 0 `,
         function (err, results) {
-            console.log(results);
+
         }
     )
 }
@@ -135,7 +132,6 @@ addRole = () => {
     connection.query(`SELECT name FROM department`,
         function (err, results) {
             departments = results;
-            console.log(`This is test: departments`);
             inquirer
                 .prompt([
                     {
@@ -159,13 +155,8 @@ addRole = () => {
                     newDept = response.roleDepartment;
                     newerRole = response.roleName;
                     newSalary = response.roleSalary;
-                    console.log(newDept);
-                    console.log(newerRole);
-                    console.log(newSalary);
-                    findDeptId(newDept, newerRole, newSalary);
-                    console.log(findDeptId(newDept));
 
-                    console.log(findDeptId(newDept) + " " + newSalary + newerRole);
+                    findDeptId(newDept, newerRole, newSalary);
                 })
         }
     )
@@ -173,7 +164,6 @@ addRole = () => {
 
 // Finds a department id based off a department name
 findDeptId = (newDept, newerRole, newSalary) => {
-    console.log(`Testing test test ${newerRole} ${newSalary}`);
     connection.query(
         `SELECT id
         FROM department
@@ -182,8 +172,6 @@ findDeptId = (newDept, newerRole, newSalary) => {
             let depId = results;
             newRole = depId[0].id;
             insertRole(newerRole, newSalary, newRole);
-            console.log(depId[0].id);
-            console.log("This is here");
         }
     )
 }
@@ -195,11 +183,10 @@ insertRole = (newerRole, newSalary, newRole) => {
         VALUES ("${newerRole}", "${newSalary}", ${newRole})`,
         function (err, results) {
             testNum++;
-            console.log(`This is testNum: ${testNum}`);
-            console.log(`This is a new test test: ${newRole} ${newerRole} ${newSalary}`);
             if (testNum == 3) {
                 mainQ();
             }
+            mainQ();
         }
     )
 }
@@ -216,19 +203,15 @@ addEmployee = () => {
 
             titleArray = [];
             results.map((i) => {
-                console.log(i.title);
                 titleArray.push(i.title);
             });
 
             results.map((i) => {
-                console.log(i.manager);
                 managerArray.push(i.manager);
             });
 
 
             let tst = managerTest();
-            console.log(tst);
-            console.log(`THIS IS WHAT I WANT TO LOOK AT ${manArray}`);
             manArray.push("null");
             managerArray = managerArray.filter(i => {
                 return i !== null;
@@ -259,7 +242,6 @@ addEmployee = () => {
                         name: 'empManager',
                     }
                 ]).then((response) => {
-                    console.log(`${response.empName} ${response.empLast} ${response.empRole} ${response.empManager}`);
                     eName = response.empName;
                     eLast = response.empLast;
                     eRole = response.empRole;
@@ -292,7 +274,6 @@ fixRole = (x, y, z, a) => {
             let depId = results;
             newRole = depId[0].id;
             insertEmployee(y, z, newRole, a);
-            console.log(newRole, y, z, a);
             return;
         }
     )
@@ -316,8 +297,6 @@ insertEmployee = (first, last, role, manager) => {
         VALUES ("${first}", "${last}", ${role}, "${manager}")`,
         function (err, results) {
             testNum++;
-            console.log(`This is testNum: ${testNum}`);
-            console.log(`This is a new test test: ${first}, ${last}, ${role}, ${manager}`);
             if (testNum >= 1) {
                 mainQ();
             }
@@ -393,14 +372,11 @@ findRoleId = () => {
         FROM role
         WHERE title = "${empR}"`,
         function (err, results) {
-            console.log(results[0].id);
-            console.log(`${results[0].id} and ${empN}`);
             connection.query(
                 `UPDATE employee
                 SET employee.role_id = ${results[0].id} 
                 WHERE employee.first_name = "${empN}"`,
                 function (err, results) {
-                    console.log(results);
                     mainQ();
                 })
 
@@ -410,13 +386,11 @@ findRoleId = () => {
 
 // Updates the employee role for a specific employee
 updateEmp = (x, y) => {
-    console.log(`IMPORTANT: ${x} + ${y}`);
     connection.query(
         `UPDATE employee
         SET employee.role_id = ?
         WHERE employee.first_name = ?`, [y, x],
         function (err, results) {
-            console.log(`IMPORTANT: ${x} + ${y}`);
             mainQ();
         }
     )
@@ -428,10 +402,7 @@ allEmp = () => {
         `SELECT first_name FROM employee`,
         function (err, results) {
             listEmp = [];
-            console.log(results[0].first_name);
             results.forEach(i => listEmp.push(i.first_name));
-            console.log(listEmp);
-            console.log(`END of This`);
         })
 }
 

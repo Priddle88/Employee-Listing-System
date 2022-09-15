@@ -2,10 +2,11 @@ INSERT INTO department (name)
 VALUES ("Sales"),
        ("Marketing"),
        ("Finance"),
-       ("Tech Support");
+       ("Tech Support"),
+       ("HR");
 
 INSERT INTO role (title, salary, department_id)
-VALUES ("Manager", 120000, 1),
+VALUES ("Manager", 120000, 5),
        ("Sales Rep", 80000, 1),
        ("Market Specialist", 70000, 2),
        ("Financial Analyst", 75000, 3),
