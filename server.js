@@ -194,6 +194,7 @@ insertRole = (newerRole, newSalary, newRole) => {
 // Creates the employees
 addEmployee = () => {
     viewManager();
+    empList();
     connection.query(`SELECT role.title AS title, employee.manager_id AS manager
      FROM role
      JOIN employee
@@ -231,7 +232,7 @@ addEmployee = () => {
                     },
                     {
                         type: 'list',
-                        choices: titleArray,
+                        choices: roleArray,
                         message: 'What is your role?',
                         name: 'empRole',
                     },
