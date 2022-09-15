@@ -13,7 +13,8 @@ let newDept;
 let newerRole;
 var departments;
 let testNum = 0;
-let pkrole;
+let empArray = [];
+let roleArray = [];
 let titleArray = [];
 let managerArray = [];
 let manArray = [];
@@ -21,6 +22,9 @@ let eName;
 let eLast;
 let eRole;
 let eManager;
+let empR = [];
+let empN = [];
+let listEmp = [];
 
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
@@ -74,6 +78,10 @@ mainQ = () => {
                 manArray = [];
                 addEmployee();
                 console.log(`This is testNum: ${testNum}`);
+            } else if (response.main == "Update Employee Role") {
+                // roleId();
+                allEmp();
+                empList();
             }
 
         })
@@ -311,6 +319,16 @@ fixRole = (x, y, z, a) => {
     )
 };
 
+fixRoleAgain = (x) => {
+    connection.query(
+        `SELECT id
+        FROM role
+        WHERE title = ?`, [x],
+        function (err, results) {
+
+        })
+}
+
 insertEmployee = (first, last, role, manager) => {
     connection.query(
         `INSERT INTO employee (first_name, last_name, role_id, manager_id)
@@ -338,6 +356,117 @@ fixManager = (x) => {
         }
     )
 };
+
+roleId = () => {
+    connection.query(
+        `SELECT role.title as title FROM role`,
+        function (err, results) {
+            console.log(results);
+            // results.forEach(i => roleArray.push(i.title));
+        })
+}
+
+empList = () => {
+    connection.query(
+        `SELECT employee.first_name as employees, role.title AS title
+         FROM employee
+         JOIN role
+         ON role.id = employee.id`,
+        function (err, results) {
+            results.forEach(i => empArray.push(i.employees));
+            results.forEach(i => roleArray.push(i.title));
+            console.log(empArray);
+
+            empPrompts();
+            // console.log(`${empR[0]} and ${empN[0]}`);
+        }
+    )
+}
+
+empPrompts = () => {
+    inquirer
+        .prompt([
+            {
+                type: 'list',
+                choices: listEmp,
+                message: 'Select an employee to update',
+                name: 'empName',
+            },
+            {
+                type: 'list',
+                choices: roleArray,
+                message: 'What is their role?',
+                name: 'empRole',
+            }
+        ]).then((response) => {
+            empN = [];
+            empR = [];
+            empN.push(response.empName);
+            empR.push(response.empRole);
+            findRoleId();
+            // console.log(`${empR} and ${empN}`);
+
+            // connection.query(
+            //     `SELECT id
+            //     FROM role
+            //     WHERE title = "empArray"`,
+            //     function (err, results) {
+            //         // console.log(`IMPORTANT: ${x} + ${y}`);
+            //         console.log(results);
+            //         console.log(` and ${empN}`);
+            //         mainQ();
+            //     }
+            // )
+        })
+}
+
+findRoleId = () => {
+    connection.query(
+        `SELECT id
+        FROM role
+        WHERE title = "${empR}"`,
+        function (err, results) {
+            // console.log(`IMPORTANT: ${x} + ${y}`);
+            console.log(results[0].id);
+            console.log(`${results[0].id} and ${empN}`);
+            connection.query(
+                `UPDATE employee
+                SET employee.role_id = ${results[0].id} 
+                WHERE employee.first_name = "${empN}"`,
+                function (err, results) {
+                    console.log(results);
+                    mainQ();
+                })
+
+        }
+    )
+}
+
+updateEmp = (x, y) => {
+    console.log(`IMPORTANT: ${x} + ${y}`);
+    connection.query(
+        `UPDATE employee
+        SET employee.role_id = ?
+        WHERE employee.first_name = ?`, [y, x],
+        function (err, results) {
+            console.log(`IMPORTANT: ${x} + ${y}`);
+            mainQ();
+        }
+    )
+};
+
+allEmp = () => {
+    connection.query(
+        `SELECT first_name FROM employee`,
+        function (err, results) {
+            // console.log(results[0].first_name);
+            listEmp = [];
+            console.log(results[0].first_name);
+            results.forEach(i => listEmp.push(i.first_name));
+            console.log(listEmp);
+            console.log(`END of This`);
+        })
+}
 
 // Connect to database
 const connection = mysql.createConnection(
