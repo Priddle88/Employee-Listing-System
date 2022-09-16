@@ -26,6 +26,9 @@ let eManager;
 let empR = [];
 let empN = [];
 let listEmp = [];
+let manId = [];
+let manName = [];
+let countNum = 0;
 
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
@@ -61,16 +64,19 @@ mainQ = () => {
                 viewManager();
                 connection.query(
                     `SELECT employee.id AS id, employee.first_name, employee.last_name, role.title AS title, department.name AS department, role.salary, employee.manager_id AS manager
-                    FROM employee
-                    INNER JOIN role
-                    ON employee.role_id = role.id
-                    JOIN department ON role.department_id = department.id
-                    ORDER BY id`,
+                        FROM employee
+                        INNER JOIN role
+                        ON employee.role_id = role.id
+                        JOIN department ON role.department_id = department.id
+                        ORDER BY id`,
                     function (err, results) {
+                        viewManager();
                         console.table(results);
                         mainQ();
                     }
-                );
+                )
+
+
             } else if (response.main == "Add Department") {
                 addDepartment();
             } else if (response.main == "Add Role") {
@@ -118,11 +124,63 @@ addDepartment = () => {
 viewManager = () => {
 
     connection.query(
-        `UPDATE employee
-        SET employee.manager_id = CONCAT(employee.first_name, " ", employee.last_name)
-        WHERE employee.manager_id > 0 `,
-        function (err, results) {
+        `SELECT employee.role_id FROM employee
+        WHERE employee.manager_id > 0`,
+        function (err, result) {
 
+            let yessir = result;
+
+            yessir.map((i) => {
+                manId.push(i.role_id);
+            });
+            compManager();
+        }
+    )
+
+    // connection.query(
+    //     `UPDATE employee
+    //     SET employee.manager_id = CONCAT(employee.first_name, " ", employee.last_name)
+    //     WHERE employee.manager_id > 0 `,
+    //     function (err, results) {
+
+    //     }
+    // )
+}
+
+upId = (manName, manId) => {
+    connection.query(
+        `UPDATE employee
+        SET employee.manager_id = "${manName[1]}"
+        WHERE employee.role_id = ${manId[1]}`,
+        function (err, results) {
+        }
+    )
+}
+
+upMan = (manName, manId) => {
+    connection.query(
+        `UPDATE employee
+        SET employee.manager_id = "${manName[0]}"
+        WHERE employee.role_id = ${manId[0]}`,
+        function (err, results) {
+        }
+    )
+}
+
+compManager = () => {
+
+    connection.query(
+        `SELECT CONCAT(employee.first_name, " ", employee.last_name) AS name FROM employee
+        WHERE employee.role_id = 1`,
+        function (err, result) {
+            let yessmam = result;
+
+            yessmam.map((i) => {
+                manName.push(i.name);
+            });
+
+            upMan(manName, manId);
+            upId(manName, manId);
         }
     )
 }
@@ -335,7 +393,6 @@ roleId = () => {
     connection.query(
         `SELECT role.title as title FROM role`,
         function (err, results) {
-            console.log(results);
         })
 }
 
