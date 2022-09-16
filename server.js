@@ -39,7 +39,7 @@ mainQ = () => {
         .prompt([
             {
                 type: "list",
-                choices: ["View all Employees", "Add Employee", "Update Employee Role", "View all Roles", "Add Role", "View all Departments", "Add Department"],
+                choices: ["View all Roles", "Add Role", "View all Departments", "Add Department", "View all Employees", "Add Employee", "Update Employee Role"],
                 message: 'What would you like to do?',
                 name: 'main',
             }
